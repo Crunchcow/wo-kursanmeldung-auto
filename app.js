@@ -166,4 +166,88 @@ function updatePrice() {
 
 function showMessage(text, ok = false) {
   const msg = $("#message");
-  msg
+  msg.textContent = text || "";
+  msg.classList.remove("ok", "err");
+  if (text) msg.classList.add(ok ? "ok" : "err");
+}
+
+function onReset() {
+  $("#firstname").value = "";
+  $("#lastname").value = "";
+  $("#email").value = "";
+  $("#note").value = "";
+  $("#sepa_holder").value = "";
+  $("#sepa_bank").value = "";
+  $("#sepa_iban").value = "";
+  $("#ds_check").checked = false;
+  $("#course").value = "";
+  selectedCourse = null;
+  $("#courseDetails").innerHTML = "";
+  updatePrice();
+  showMessage("");
+  $("#debugOut").textContent = "";
+}
+
+function getFormPayload() {
+  if (!selectedCourse) throw new Error("Bitte Kurs auswählen.");
+  const firstname = $("#firstname").value.trim();
+  const lastname  = $("#lastname").value.trim();
+  const email     = $("#email").value.trim();
+  const holder    = $("#sepa_holder").value.trim();
+  const bank      = $("#sepa_bank").value.trim();
+  const iban      = $("#sepa_iban").value.trim();
+  const dsOk      = $("#ds_check").checked;
+
+  if (!firstname || !lastname || !email) throw new Error("Bitte Vorname, Nachname und E-Mail ausfüllen.");
+  if (!/\S+@\S+\.\S+/.test(email)) throw new Error("Bitte eine gültige E-Mail angeben.");
+  if (!holder || !bank || !iban) throw new Error("Bitte SEPA-Felder vollständig ausfüllen.");
+  if (!isValidIBAN(iban)) throw new Error("Die IBAN scheint nicht gültig zu sein.");
+  if (!dsOk) throw new Error("Bitte den Datenschutz- und SEPA-Hinweis bestätigen.");
+
+  const membership = readMembership() === "mitglied";
+  const extent = readExtent();
+
+  return {
+    courseId: selectedCourse.courseId,
+    firstname,
+    lastname,
+    email,
+    membership,
+    extent,
+    sepa: { holder, iban: ibanNormalize(iban), bank },
+    note: $("#note").value.trim(),
+    dsgvoAccepted: true
+  };
+}
+
+async function onSubmit() {
+  try {
+    showMessage("");
+    const payload = getFormPayload();
+    $("#debugOut").textContent = JSON.stringify(payload, null, 2);
+
+    if (CONFIG.DEMO_MODE) {
+      await new Promise(r => setTimeout(r, 600));
+      showMessage("Demo: Vormerkung entgegengenommen. (Es wurde nichts gespeichert.)", true);
+      return;
+    }
+
+    if (!CONFIG.API_SIGNUP_URL) throw new Error("API_SIGNUP_URL ist nicht konfiguriert.");
+    const res = await fetch(CONFIG.API_SIGNUP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const errTxt = await res.text();
+      throw new Error("Serverfehler: " + res.status + " – " + errTxt);
+    }
+    const data = await res.json();
+    $("#debugOut").textContent += "\n\nAntwort:\n" + JSON.stringify(data, null, 2);
+    const statusTxt = data?.status === "Warteliste" ? "Warteliste" : "Anmeldung";
+    showMessage(`Erfolg: ${statusTxt}. Mandatsreferenz: ${data?.mandatsreferenz ?? "–"}`, true);
+  } catch (e) {
+    console.error(e);
+    showMessage(String(e.message || e), false);
+  }
+}
