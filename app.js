@@ -4,7 +4,7 @@
 const CONFIG = {
   DEMO_MODE: false, // true = no network calls, simulate responses
   API_COURSES_URL: "https://defaulteee05d909b754472b1cd58561389d4.d0.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/6bfd24081dec4dce82028319d968872b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6ab1lS3DO7Gm_4_OAlJIAl4RK84UucIgqvdO1-PKVU", // e.g. https://prod-.../courses
-  API_SIGNUP_URL: "",  // e.g. https://prod-.../signup
+  API_SIGNUP_URL: "https://defaulteee05d909b754472b1cd58561389d4.d0.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/15e3b87d3a8c4350af3f475171d5a283/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yzp3Dh0wv1yRLqfD-0XD7t72RmBJmqrDM6Sr3bLtD4I",  // e.g. https://prod-.../signup
 };
 
 // Demo course data (matches the recommended GET /courses payload)
