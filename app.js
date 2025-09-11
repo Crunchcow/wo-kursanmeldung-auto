@@ -2,8 +2,8 @@
 
 // ===== Configuration =====
 const CONFIG = {
-  DEMO_MODE: true, // true = no network calls, simulate responses
-  API_COURSES_URL: "", // e.g. https://prod-.../courses
+  DEMO_MODE: false, // true = no network calls, simulate responses
+  API_COURSES_URL: "https://defaulteee05d909b754472b1cd58561389d4.d0.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/6bfd24081dec4dce82028319d968872b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6ab1lS3DO7Gm_4_OAlJIAl4RK84UucIgqvdO1-PKVU", // e.g. https://prod-.../courses
   API_SIGNUP_URL: "",  // e.g. https://prod-.../signup
 };
 
